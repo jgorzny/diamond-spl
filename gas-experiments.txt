@@ -1,0 +1,17 @@
+=== burn() gas comparison ===
+Diamond SPL product :  22,518 gas
+Plain ERC20Burnable :  17,553 gas
+Diamond overhead    :  +4,965 gas  (~28%)
+
+=== burnFrom() gas comparison ===
+Diamond SPL product :  18,877 gas
+Plain ERC20Burnable :  13,994 gas
+Diamond overhead    :  +4,883 gas
+
+The diamond pattern introduces a marginal increase. The ~5k gas overhead comes from:
+1. The fallback() dispatch - a cold SLOAD into the selectorToFacetAndPosition mapping (~2100 gas)
+2. The DELEGATECALL opcode itself (~700 gas)
+3. The diamond storage slot for ERC20 (keccak256-based pointer) vs plain slot access
+
+The test_GasComparison_BurnAmounts test also reveals that the first burn costs more (~8400 vs ~3900 gas for subsequent burns) on the diamond side - because the first call warms up the diamond storage slot, which is cold for the keccak256-derived position.
+

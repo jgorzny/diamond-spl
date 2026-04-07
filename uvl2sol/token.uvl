@@ -1,0 +1,19 @@
+namespace TokenProductLine
+
+features
+	Token
+		mandatory
+			ERC20
+		optional
+			Burnable
+			Extra
+				or
+					Metadata
+					Permit
+			CrossChain
+				[0..1]
+					SuperchainERC20
+					OFT
+
+constraints
+	SuperchainERC20 => Burnable
